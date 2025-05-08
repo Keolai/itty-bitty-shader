@@ -9,6 +9,7 @@ uniform sampler2D depthtex0;
 uniform sampler2D colortex5;
 uniform float far; 
 uniform int worldTime;
+uniform vec3 shadowLightPosition;
 
 uniform mat4 gbufferProjectionInverse;
 uniform mat4 gbufferModelViewInverse;
@@ -24,6 +25,8 @@ uniform int isEyeInWater;
 in vec2 texcoord;
 
 const vec3 dayfogColor = vec3(0.522, 0.471, 0.408);
+const vec3 sunColor = vec3(0.702, 0.6, 0.282);
+const vec3 moonColor = vec3(0.29, 0.58, 0.749);
 const vec3 rainfogColor = vec3(0.373, 0.439, 0.502);
 const vec3 nightFogColor = vec3(0.106, 0.129, 0.169);
 const vec3 oceanfogColor = vec3(0.302, 0.322, 0.341);
@@ -93,6 +96,10 @@ vec3 getFogColor(float time, int biome){
 void main() { //fog
   color = texture(colortex0, texcoord);
   vec3 oldFogColor = texture(colortex5, texcoord).rgb;
+  float dayOrNightVal = dayOrNight(float(worldTime));
+
+  vec3 lightVector = normalize(shadowLightPosition);
+	vec3 worldLightVector = mat3(gbufferModelViewInverse) * lightVector;
 
   float depth = texture(depthtex0, texcoord).r;
   if(depth == 1.0){
@@ -108,18 +115,21 @@ void main() { //fog
     vec3 newFogColor = getFogColor(float(worldTime), biome);
     float fogColorDistance = distance(newFogColor, oldFogColor); //fix
     vec3 mixedFog = mix(newFogColor,oldFogColor, fogColorDistance); 
-
+    vec3 sunOrMoonFog = mix(moonColor,sunColor,dayOrNightVal);
+  
     oldFog = vec4(mixedFog,1.0);
     vec3 fogOrigin = cameraPosition;
     vec3 fogDirection = normalize(uCameraView - fogOrigin);
     float fogDepth = distance(uCameraView,cameraPosition);
     float heightFogFactor = uFogHeight * exp(-fogOrigin.y * uFogDensity) * (1.0 - exp(-fogDepth * fogDirection.y * uFogDensity)) / fogDirection.y;
+     float sunAmount = max(dot(fogDirection,worldLightVector),0.0);
+     mixedFog = mix(mixedFog,sunOrMoonFog,sunAmount);
     float proxDepth = clamp(dist * 1.5, 0., 1.0);
     mixedFog *= eyeWaterColors[isEyeInWater];
     if (isEyeInWater > 1){
       mixedFog = eyeWaterColors[isEyeInWater];
     }
-    float extraFog = min((dist * 2),(dist * rainStrength) + (dist * min(isEyeInWater,1.0)) + dist * (1 - dayOrNight(float(worldTime)))/2.);
+    float extraFog = min((dist * 2),(dist * rainStrength) + (dist * min(isEyeInWater,1.0)) + dist * (1 - dayOrNightVal)/2.);
     float finalFogFactor = clamp(heightFogFactor * proxDepth + extraFog, 0.0, 1.0);
     color.rgb = mix(color.rgb,mixedFog, finalFogFactor);
 //color.rgb = vec3(heightFogFactor);
@@ -128,5 +138,6 @@ void main() { //fog
 //composite2.fsh: composite2.fsh: 0(73) : error C1503: undefined variable "fogColorDistance"
 //composite2.fsh: composite2.fsh: 0(74) : error C7011: implicit cast from "float" to "vec3"
 //composite2.fsh: composite2.fsh: 0(77) : error C1503: undefined variable "rainFogColor"
+//composite2.fsh: composite2.fsh: 0(105) : error C1503: undefined variable "shadowLightPosition"
 
 
