@@ -57,6 +57,8 @@ void main() {
 		case 9:
 		position.x += offset /2 * (max((modelPos.y * 2),2)) + extraNoise.r/20;
 		break;
+		case 10:
+		position.x += (extraNoise.r/10 + offset * 2);
 	}
 	position.xyz -= cameraPosition.xyz;
 	gl_Position = (gl_ProjectionMatrix * gbufferModelView * position);

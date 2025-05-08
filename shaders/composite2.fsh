@@ -1,5 +1,6 @@
 #version 330 compatibility
 #include /lib/distort.glsl
+#include /lib/dayCycle.glsl
 
 #define FOG_DENSITY 5.0
 
@@ -83,8 +84,7 @@ vec3 getFogColor(float time, int biome){
     // return endFogColor;
     // break;
     }
-	float dayNightMix = sin(time/3694.78); //1 is daytime, -1 is night time
-	dayNightMix = (dayNightMix/2.0) + 0.5;
+	float dayNightMix = dayOrNight(time);
   vec3 fog = mix(nightFogColor, dayfogColor, dayNightMix);
 	return mix(fog, rainfogColor, rainStrength);
 
@@ -119,7 +119,9 @@ void main() { //fog
     if (isEyeInWater > 1){
       mixedFog = eyeWaterColors[isEyeInWater];
     }
-    color.rgb = mix(color.rgb,mixedFog, clamp(heightFogFactor * proxDepth + (dist * rainStrength) + (dist * min(isEyeInWater,1.0)), 0.0, 1.0));
+    float extraFog = min((dist * 2),(dist * rainStrength) + (dist * min(isEyeInWater,1.0)) + dist * (1 - dayOrNight(float(worldTime)))/2.);
+    float finalFogFactor = clamp(heightFogFactor * proxDepth + extraFog, 0.0, 1.0);
+    color.rgb = mix(color.rgb,mixedFog, finalFogFactor);
 //color.rgb = vec3(heightFogFactor);
 }
 
