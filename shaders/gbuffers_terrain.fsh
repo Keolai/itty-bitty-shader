@@ -32,9 +32,9 @@ layout(location = 4) out vec4 purpleLightData; //6
 
 void main() {
 	color = texture(gtexture, texcoord) * glcolor; //biome tint
-	color *= texture(lightmap, lmcoord); //lightmap
-	  vec4 startLight = texture(lightmap, data.lightMapCoord);
-    color = applyColouredLight(color, startLight, data.worldPos, data.localChunkPos);
+	//color *= texture(lightmap, lmcoord); //lightmap
+	vec4 startLight = texture(lightmap, data.lightMapCoord);
+    color = applyColouredLight(color, startLight, data.worldPos, data.localChunkPos); //this is causing perf issues
 	if (color.a < alphaTestRef) {
 		discard;
 	}

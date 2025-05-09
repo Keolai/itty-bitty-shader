@@ -13,7 +13,7 @@ flat out int blockID;
 in vec3 mc_Entity;
 in vec3 at_midBlock;
 
-
+//https://github.com/eclipseisoffline/iris-coloured-lights this adds colored light
 // uniform mat4 gbufferModelView;
 // uniform mat4 gbufferModelViewInverse;
 uniform mat4 shadowModelView;

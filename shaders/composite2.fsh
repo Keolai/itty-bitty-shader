@@ -162,6 +162,6 @@ void main() {
     sunlight += max(getSunset(float(worldTime)) - 0.5,0.) * sunsetColor; //sunset
 	color.rgb *= blocklight + skylight + ambient + sunlight*float(1.) + blueLight + purpLight;
     color.rgb *= eyeWaterColors[isEyeInWater];
-	//color.rgb *= vec3(lightmap.r);
+	//color.rgb = vec3(lightmap,0.0);
 }
 //terrain_solid: terrain_solid: 0(48) : error C1503: undefined variable "blueLighData"
