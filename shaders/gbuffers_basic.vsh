@@ -1,4 +1,4 @@
-#version 330 compatibility
+#version 430 compatibility
 
 out vec2 lmcoord;
 out vec4 glcolor;

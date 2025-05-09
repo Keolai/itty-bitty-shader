@@ -1,4 +1,4 @@
-#version 330 compatibility
+#version 430 compatibility
 #include /lib/distort.glsl
 
 out vec2 texcoord;
