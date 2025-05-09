@@ -10,7 +10,7 @@ out vec4 glcolor;
 out vec3 normal;
 flat out int blockID;
 
-in vec2 mc_Entity;
+in vec3 mc_Entity;
 in vec3 at_midBlock;
 
 
@@ -25,29 +25,13 @@ uniform int frameCounter;
 uniform float rainStrength;
 uniform sampler2D noisetex;
 
-out fragment_data {
-    vec2 textureCoord;
-    vec2 lightMapCoord;
-    vec4 glColor;
-
-    vec3 worldPos;
-    flat ivec3 localChunkPos;
-} data;
-
 
 void main() {
 	gl_Position = ftransform();
-	 data.textureCoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
-    data.lightMapCoord = (gl_TextureMatrix[1] * gl_MultiTexCoord1).xy;
-    data.glColor = gl_Color;
-
-    data.worldPos = modelToWorldSpace(gl_Vertex.xyz);
-    data.localChunkPos = blockPosToChunkPos(blockPosToLocalPos(worldPosToBlockPos(data.worldPos, at_midBlock)));
-    lightCheck(at_midBlock, mc_Entity);
-	lightCheck(at_midBlock, mc_Entity);  
 	texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
 	lmcoord = (gl_TextureMatrix[1] * gl_MultiTexCoord1).xy;
 	lmcoord = (lmcoord * 33.05 / 32.0) - (1.05 / 32.0);
+	lightCheck(at_midBlock, mc_Entity);  
 
 	vec4 viewpos = gbufferModelViewInverse * gl_ModelViewMatrix * gl_Vertex;
 	vec4 modelPos = gl_ModelViewMatrix * gl_Vertex;
@@ -87,3 +71,4 @@ void main() {
 }
 
 //terrain_solid: io.github.douira.glsl_transformer.parser.ParsingException: Unexpected token ')'
+//
