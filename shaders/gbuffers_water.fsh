@@ -15,11 +15,12 @@ in vec3 normal;
 in float offset;
 in vec3 noise;
 
-/* RENDERTARGETS: 0,1,2,6 */
+/* RENDERTARGETS: 0,1,2,6,7 */
 layout(location = 0) out vec4 color;
 layout(location = 1) out vec4 lightmapData; //yellow light sources 
 layout(location = 2) out vec4 encodedNormal;
 layout(location = 3) out vec4 specularity;
+layout(location = 4) out vec4 waterMask;
 
 void main() {
 	color = texture(gtexture, texcoord) * glcolor;
@@ -29,7 +30,7 @@ void main() {
 	vec3 worldLightVector = mat3(gbufferModelViewInverse) * lightVector;
 	float specular = dot(normal, worldLightVector); //issue
 	//color += clamp(specular,0,1);
-	specularity = vec4(clamp((specular * 2),0,1),0,0,1) ;
+	specularity = vec4(clamp((specular * 2),0,1),1,0,1) ;
 		color.a *= 0.4;
 	//vec3 specColor = specular;
 	//color.rgb += vec3(offset/4);
@@ -40,6 +41,8 @@ void main() {
 	}
 	lightmapData = vec4(lmcoord, 0.0, 1.0);
 	encodedNormal = vec4(normal * 0.5 + 0.5, 1.0);
+	waterMask = vec4(1.0,0.0,0.0,0.0);
+	//color = waterMask;
 	//color = specularity;
 }
 

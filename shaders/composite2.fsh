@@ -18,6 +18,7 @@ uniform sampler2D shadowtex0;
 uniform sampler2D shadowtex1;
 uniform sampler2D shadowcolor0;
 uniform sampler2D colortex6;
+uniform sampler2D colortex7;
 uniform sampler2D colortex10;
 
 uniform int isEyeInWater;
@@ -160,11 +161,13 @@ void main() {
   vec3 voronoi = texture(colortex10,texcoord).rgb;
 	vec3 currentSunlight = getSunlightColor(float(worldTime));
 	vec3 shadow = getSoftShadow(shadowClipPos);
+  float waterMask = texture(colortex6, texcoord).g;
 	vec3 sunlight = max(currentSunlight * dot(normal, worldLightVector) * shadow,vec3(0.0));
     sunlight += max(getSunset(float(worldTime)) - 0.5,0.) * sunsetColor; //sunset
     color.rgb += sunlight * clamp((min(pow(texture(colortex6,texcoord).r * 1.2,10),1.0) *(1- (depth)) * 4),0,1) * shadow; //water highlights
-	color.rgb *= blocklight + skylight + ambient + sunlight*float(1.) + blueLight + purpLight;
+	  color.rgb *= blocklight + skylight + ambient + sunlight*float(1.) + blueLight + purpLight;
     color.rgb *= eyeWaterColors[isEyeInWater];
+   // color.rgb = texture(colortex1, texcoord).rgb;
    // color.rgb = vec3((1 - depth) * 2);
 //color.rgb = vec3(getSunset(float(worldTime))- 0.5);
 }

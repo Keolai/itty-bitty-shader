@@ -7,6 +7,7 @@
 uniform sampler2D colortex0;
 uniform sampler2D depthtex0;
 uniform sampler2D colortex5;
+//uniform sampler2D colortex6;
 uniform float far; 
 uniform int worldTime;
 uniform vec3 shadowLightPosition;
@@ -105,7 +106,8 @@ void main() { //fog
 	vec3 worldLightVector = mat3(gbufferModelViewInverse) * lightVector;
 
   float depth = texture(depthtex0, texcoord).r;
-  if(depth == 1.0 && isEyeInWater==0 && biome_category != CAT_NETHER){
+ // float waterMask = texture(colortex6,texcoord).g;
+  if((depth == 1.0 && isEyeInWater==0 && biome_category != CAT_NETHER)){
     return;
   }
 
@@ -135,6 +137,7 @@ void main() { //fog
     float extraFog = min((dist * 2),((dist * rainStrength) + (dist * min(isEyeInWater,1.0)) + dist * (1 - dayOrNightVal)/7.));
     float finalFogFactor = clamp(heightFogFactor * proxDepth + extraFog, 0.0, 1.0);
     color.rgb = mix(color.rgb,mixedFog, finalFogFactor);
+    //color.rgb = vec3(waterMask);
 //color.rgb = vec3(heightFogFactor);
 }
 
