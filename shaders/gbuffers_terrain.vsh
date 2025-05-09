@@ -59,13 +59,13 @@ void main() {
 	vec4 noise = texture(noisetex,position.xy);
 	float offset = (float((sin(frames * (0.01))))/5) * (noise.r* 2 - 1.);
 	//float frames = float(frameCounter)/7000;
-	vec4 extraNoise = texture(noisetex, (position.xz * vec2(0.1) + vec2(frames/7000))) * (1.0 + (rainStrength * 2.));
+	vec4 extraNoise = texture(noisetex, (position.xz * vec2(0.1) + vec2(frames/1000))) * (1.0 + (rainStrength * 2.));
 	switch(blockID){
 		case 8: //leaves
 			//gl_Position.y
 			//vec4 position = vec4(0); 
-			float totalOffset = (offset * clamp(modelPos.y,-1,1)) * (1. + rainStrength) + offset/2;
-			position.x += extraNoise.r/15 + totalOffset;
+			float totalOffset = (offset * clamp(modelPos.y,-1,1)) * (1. + rainStrength);
+			position.x += extraNoise.r/10 + totalOffset - 0.1;
 			position.z -= extraNoise.r/16;
 			//position.x = min(1.0, position.x);
 			//position.z += offset;
