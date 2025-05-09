@@ -14,23 +14,37 @@ in vec3 mc_Entity;
 in vec3 at_midBlock;
 
 
-uniform mat4 gbufferModelView;
-uniform mat4 gbufferModelViewInverse;
+// uniform mat4 gbufferModelView;
+// uniform mat4 gbufferModelViewInverse;
 uniform mat4 shadowModelView;
 uniform mat4 shadowModelViewInverse;
-uniform mat4 gbufferProjection;
-uniform mat4 gbufferProjectionInverse;
-uniform vec3 cameraPosition;
+// uniform mat4 gbufferProjection;
+// uniform mat4 gbufferProjectionInverse;
+// uniform vec3 cameraPosition;
 uniform int frameCounter;
 uniform float rainStrength;
 uniform sampler2D noisetex;
 
+out fragment_data {
+    vec2 textureCoord;
+    vec2 lightMapCoord;
+    vec4 glColor;
+
+    vec3 worldPos;
+    flat ivec3 localChunkPos;
+} data;
 
 void main() {
 	gl_Position = ftransform();
 	texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
 	lmcoord = (gl_TextureMatrix[1] * gl_MultiTexCoord1).xy;
 	lmcoord = (lmcoord * 33.05 / 32.0) - (1.05 / 32.0);
+	data.textureCoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
+    data.lightMapCoord = (gl_TextureMatrix[1] * gl_MultiTexCoord1).xy;
+    data.glColor = gl_Color;
+
+    data.worldPos = modelToWorldSpace(gl_Vertex.xyz);
+    data.localChunkPos = blockPosToChunkPos(blockPosToLocalPos(worldPosToBlockPos(data.worldPos, at_midBlock)));
 	lightCheck(at_midBlock, mc_Entity);  
 
 	vec4 viewpos = gbufferModelViewInverse * gl_ModelViewMatrix * gl_Vertex;
@@ -68,6 +82,7 @@ void main() {
 	position.xyz -= cameraPosition.xyz;
 	gl_Position = (gl_ProjectionMatrix * gbufferModelView * position);
 	glcolor = gl_Color;
+	
 }
 
 //terrain_solid: io.github.douira.glsl_transformer.parser.ParsingException: Unexpected token ')'

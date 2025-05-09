@@ -31,6 +31,12 @@ const uint maxColouredLightsChunk = MAX_COLOURED_LIGHTS;
 const vec3 centreOffset = vec3(0.5);
 const float midblockUnit = 64.0;
 
+uniform mat4 gbufferModelView;
+uniform mat4 gbufferModelViewInverse;
+uniform mat4 gbufferProjection;
+uniform mat4 gbufferProjectionInverse;
+uniform vec3 cameraPosition;
+
 // Buffer size = maxChunks * maxVerticalChunks * maxChunks * 512
 layout (std430, binding = 0) coherent buffer positionsCheckedBuffer {
     uint[] positionsChecked;
@@ -41,12 +47,6 @@ layout(std430, binding = 1) coherent buffer lightColoursBuffer {
     uint[maxChunks][maxVerticalChunks][maxChunks] sizes;
     LightColourBlock[][maxColouredLightsChunk] lights;
 } lightColours;
-
-uniform mat4 gbufferModelView;
-uniform mat4 gbufferModelViewInverse;
-uniform mat4 gbufferProjection;
-uniform mat4 gbufferProjectionInverse;
-uniform vec3 cameraPosition;
 
 ivec3 worldPosToBlockPos(vec3 worldPos, vec3 midBlock) {
     worldPos += (midBlock / midblockUnit);

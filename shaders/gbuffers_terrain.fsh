@@ -2,6 +2,7 @@
 
 uniform sampler2D lightmap;
 uniform sampler2D gtexture;
+#include /lib/cl/common.glsl
 
 
 uniform int blockEntityId;
@@ -62,6 +63,7 @@ void main() {
 //Shader compilation failed, see log for details
 //terrain_solid: terrain_solid: 0(53) : error C1503: undefined variable "blockId"
 //TERRAIN_SOLID: TERRAIN_SOLID: Fragment inf
+
 
 
 
