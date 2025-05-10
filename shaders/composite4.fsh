@@ -54,12 +54,12 @@ void main() { //this controlls the light stuf
    // vec4 skyMap = vec4(vec3(float (depth == 1.)),1.0);
     //skyBuffer = skyMap;
    // 
-    vec3 lightVector = normalize(shadowLightPosition);
-	vec4 clipLightVector = gbufferProjection * vec4(lightVector,1.0);
-    vec3 ndcLight = clipLightVector.xyz * clipLightVector.w;
+    //vec3 lightVector = normalize(shadowLightPosition);
+	vec4 clipLightVector = gbufferProjection * vec4(shadowLightPosition,1.0);
+    vec3 ndcLight = clipLightVector.xyz / clipLightVector.w;
     vec3 screenLight = ndcLight * 0.5 + 0.5;
     vec3 screenPos = screenLight * vec3(viewWidth,viewHeight,1.0);
-    vec2 center = lightVector.xy;
+    vec2 center = screenLight.xy;
 	float blurStart = 1.0;
     float blurWidth = 0.5;
 
@@ -79,7 +79,7 @@ void main() { //this controlls the light stuf
     
     preColor /= float(nsamples);
     
-	//color.rgb += preColor.rgb/4;
+	color.rgb += preColor.rgb/4;
     //color.rgb = skyMap.rgb;
 	
 	//color.rgb = vec3(lightDistance);
