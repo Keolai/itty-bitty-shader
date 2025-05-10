@@ -30,10 +30,10 @@ void main() {
 	vec4 viewpos = gbufferModelViewInverse * gl_ModelViewMatrix * gl_Vertex;
 	vec4 position = viewpos;
 	position.xyz += cameraPosition.xyz;
-	float frames = float(frameCounter)/10;
+	float frames = float(frameCounter)/15;
 	noise = texture(noisetex, (position.xz * vec2(0.05) + vec2(frames/40))).rgb;
 	//offset = exp(sin(frames + position.x + noise.r));
-	float sumOfSines = sin(position.x * 10 +position.z + noise.r + frames) * 1.5 + sin(position.x * 10 + 1.6*frames)
+	float sumOfSines = sin(position.x * 10 + noise.r + frames) * 1.5 + sin(position.x * 9 + 1.6*frames)
 	 + 0.5 * sin(position.x *5 + 3*frames);
 	offset = sumOfSines;
 	float slope =1.5 * cos(position.x * 10 + noise.r + frames) - sin(position.z + noise.r);
@@ -43,7 +43,7 @@ void main() {
 	//normal = gl_NormalMatrix * gl_Normal; // this gives us the normal in view space
 	//normal = mat3(gbufferModelViewInverse) * normal; // this converts the normal to world/player space
 	//blockID = int(mc_Entity.x);
-			position.y += offset/10;
+			position.y += offset/40;
 			//position.z += offset/40;
 			worldPos = position.xyz;
 			position.xyz -= cameraPosition.xyz;

@@ -3,3 +3,6 @@ Made by Bálint
 
 Colored light library from:
 https://github.com/eclipseisoffline/iris-coloured-lights
+
+Radial blur for god rays:
+https://www.shadertoy.com/view/XsfSDs

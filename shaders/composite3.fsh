@@ -6,8 +6,9 @@
 
 uniform sampler2D colortex0;
 uniform sampler2D depthtex0;
+uniform sampler2D depthtex1;
 uniform sampler2D colortex5;
-//uniform sampler2D colortex6;
+uniform sampler2D colortex6;
 uniform float far; 
 uniform int worldTime;
 uniform vec3 shadowLightPosition;
@@ -22,12 +23,15 @@ uniform int biome_category;
 uniform int biome;
 uniform float rainStrength;
 uniform vec3 fogColor;
+uniform vec3 skyColor;
 
 uniform int isEyeInWater;
 
 
 in vec2 texcoord;
 
+const vec3 waterFogColor = vec3(0.125, 0.247, 0.322);
+const vec3 nightWaterFog = vec3(0);
 const vec3 dayfogColor = vec3(0.522, 0.471, 0.408);
 const vec3 sunColor = vec3(0.702, 0.6, 0.282);
 const vec3 moonColor = vec3(0.29, 0.58, 0.749);
@@ -106,14 +110,25 @@ void main() { //fog
 	vec3 worldLightVector = mat3(gbufferModelViewInverse) * lightVector;
 
   float depth = texture(depthtex0, texcoord).r;
- // float waterMask = texture(colortex6,texcoord).g;
-  if((depth == 1.0 && isEyeInWater==0 && biome_category != CAT_NETHER)){
+  float originalDepth = depth;
+  float waterMask = texture(colortex6,texcoord).g;
+  float waterDepth = texture(depthtex1,texcoord).r;
+  depth = max(depth, waterDepth);
+  if(((depth == 1.0 && waterMask != 1.)&& isEyeInWater==0 && biome_category != CAT_NETHER)){
     return;
   }
+
+
+  //composite3.fsh: composite3.fsh: 0(112) : error C1503: undefined variable "colortex6"
+
 
     vec3 NDCPos = vec3(texcoord.xy, depth) * 2.0 - 1.0;
     vec3 viewPos = projectAndDivide(gbufferProjectionInverse, NDCPos); //viewspace
     float dist = length(viewPos) / far;
+
+    vec3 topNDCPos = vec3(texcoord.xy, originalDepth) * 2.0 - 1.0;
+    vec3 topviewPos = projectAndDivide(gbufferProjectionInverse, topNDCPos); //viewspace
+    float topdist = length(topviewPos) / far;
     float fogFactor = exp(-FOG_DENSITY * (1.0 - dist));
     vec3 uCameraView = (gbufferModelViewInverse * vec4(viewPos,1.0)).xyz + cameraPosition;//worldpos
     vec4 noiseFactor = texture(noisetex,uCameraView.xz * vec2(0.01));
@@ -128,16 +143,18 @@ void main() { //fog
     float fogDepth = distance(uCameraView,cameraPosition);
     float heightFogFactor = uFogHeight * exp(-fogOrigin.y * uFogDensity) * (1.0 - exp(-fogDepth * fogDirection.y * uFogDensity)) / fogDirection.y;
      float sunAmount = max(dot(fogDirection,worldLightVector),0.0);
-     mixedFog = mix(mixedFog,sunOrMoonFog,sunAmount * float(hasSkylight));
     float proxDepth = clamp(dist * 1.5, 0., 1.0);
     mixedFog *= eyeWaterColors[isEyeInWater];
+    mixedFog = mixedFog * (1 - waterMask) + mix(nightWaterFog,waterFogColor,dayOrNight(float(worldTime))) * waterMask;
+    mixedFog = mix(mixedFog,sunOrMoonFog,sunAmount * float(hasSkylight));
     if (isEyeInWater > 1){
       mixedFog = eyeWaterColors[isEyeInWater];
     }
-    float extraFog = min((dist * 2),((dist * rainStrength) + (dist * min(isEyeInWater,1.0)) + dist * (1 - dayOrNightVal)/7.));
+    float extraFog = min((dist * 2),((dist * rainStrength) + (dist * min(isEyeInWater,1.0)) + dist * (1 - dayOrNightVal)/7. + (dist/2 * waterMask)));
     float finalFogFactor = clamp(heightFogFactor * proxDepth + extraFog, 0.0, 1.0);
     color.rgb = mix(color.rgb,mixedFog, finalFogFactor);
-    //color.rgb = vec3(waterMask);
+    color.rgb = mix(color.rgb, skyColor, topdist);
+    //color.rgb = vec3(topdist);
 //color.rgb = vec3(heightFogFactor);
 }
 
