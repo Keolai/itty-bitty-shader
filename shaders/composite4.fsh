@@ -9,7 +9,7 @@
 
 uniform sampler2D colortex0;
 uniform sampler2D colortex1;
-uniform sampler2D colortex2;
+uniform sampler2D colortex9;
 uniform sampler2D colortex3;
 uniform sampler2D colortex4;
 uniform sampler2D depthtex0;
@@ -31,12 +31,12 @@ uniform float viewHeight;
 uniform float viewWidth;
 
 const int shadowMapResolution = 2048;
-const int nsamples = 10;
+const int nsamples = 20;
 
 
 in vec2 texcoord;
 
-/* RENDERTARGETS: 0,1,3,4 */
+/* RENDERTARGETS: 0,9 */
 layout(location = 0) out vec4 color;
 
 
@@ -49,11 +49,19 @@ vec3 projectAndDivide(mat4 projectionMatrix, vec3 position){
 
 void main() { //this controlls the light stuf
 	color = texture(colortex0, texcoord);
+    float depth = texture(depthtex0, texcoord).r;
+    vec3 lightmap = texture(colortex1,texcoord).rgb;
+   // vec4 skyMap = vec4(vec3(float (depth == 1.)),1.0);
+    //skyBuffer = skyMap;
+   // 
     vec3 lightVector = normalize(shadowLightPosition);
-	vec3 worldLightVector = mat3(gbufferModelViewInverse) * lightVector;
-    vec2 center = vec2(0.5);
+	vec4 clipLightVector = gbufferProjection * vec4(lightVector,1.0);
+    vec3 ndcLight = clipLightVector.xyz * clipLightVector.w;
+    vec3 screenLight = ndcLight * 0.5 + 0.5;
+    vec3 screenPos = screenLight * vec3(viewWidth,viewHeight,1.0);
+    vec2 center = lightVector.xy;
 	float blurStart = 1.0;
-    float blurWidth = 0.1;
+    float blurWidth = 0.5;
 
     
 	vec2 uv = texcoord.xy;
@@ -65,19 +73,21 @@ void main() { //this controlls the light stuf
     for(int i = 0; i < nsamples; i++)
     {
         float scale = blurStart + (float(i)* precompute);
-        preColor += texture(colortex0, uv * scale + center);
+        preColor += texture(colortex9, uv * scale + center);
     }
     
     
     preColor /= float(nsamples);
     
-	color = preColor;
+	//color.rgb += preColor.rgb/4;
+    //color.rgb = skyMap.rgb;
 	
 	//color.rgb = vec3(lightDistance);
 }
 
 //
 //composite1.fsh: composite1.fsh: 0(124) : error C1503: undefined variable "lightMap"
+//sky_textured: sky_textured: 0(32) : error C1503: undefined variable "lightData"
 
 
 

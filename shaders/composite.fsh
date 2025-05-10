@@ -33,11 +33,13 @@ const int shadowMapResolution = 2048;
 
 in vec2 texcoord;
 
-/* RENDERTARGETS: 0,1,3,4 */
+/* RENDERTARGETS: 0,1,3,4,9 */
 layout(location = 0) out vec4 color;
 layout(location = 1) out vec4 lightmapData;
 layout(location = 2) out vec4 blueLightData; //3
 layout(location = 3) out vec4 purpleLightData; //4
+layout(location = 4) out vec4 skyMap; //4
+
 
 
 vec3 projectAndDivide(mat4 projectionMatrix, vec3 position){
@@ -51,6 +53,7 @@ void main() { //this controlls the light stuf
 	color = texture(colortex0, texcoord);
 
 	float depth = texture(depthtex0, texcoord).r;
+	skyMap = vec4(vec3(float (depth == 1.)),1.0);
 	if (depth == 1.0) {
   		return;
 	}

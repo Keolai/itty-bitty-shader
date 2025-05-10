@@ -153,7 +153,7 @@ void main() { //fog
     float extraFog = min((dist * 2),((dist * rainStrength) + (dist * min(isEyeInWater,1.0)) + dist * (1 - dayOrNightVal)/7. + (dist/2 * waterMask)));
     float finalFogFactor = clamp(heightFogFactor * proxDepth + extraFog, 0.0, 1.0);
     color.rgb = mix(color.rgb,mixedFog, finalFogFactor);
-    color.rgb = mix(color.rgb, skyColor, topdist);
+    color.rgb = mix(color.rgb, skyColor, waterMask * topdist);
     //color.rgb = vec3(topdist);
 //color.rgb = vec3(heightFogFactor);
 }
