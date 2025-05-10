@@ -60,7 +60,7 @@ void main() { //this controlls the light stuf
     vec3 screenLight = ndcLight * 0.5 + 0.5;
     vec3 screenPos = screenLight * vec3(viewWidth,viewHeight,1.0);
     vec2 center = screenLight.xy;
-	float blurStart = 1.0;
+	float blurStart = 0.5;
     float blurWidth = 0.5;
 
     
