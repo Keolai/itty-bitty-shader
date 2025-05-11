@@ -19,7 +19,6 @@ uniform sampler2D shadowtex1;
 uniform sampler2D shadowcolor0;
 uniform sampler2D colortex6;
 uniform sampler2D colortex7;
-uniform sampler2D colortex10;
 
 uniform int isEyeInWater;
 
@@ -158,7 +157,6 @@ void main() {
     vec3 blueLight = blueMap.r * blueLightColor;
     vec3 purpLight = purpleMap.r * purpleLightColor;
 	vec4 shadowClipPos = shadowProjection * vec4(shadowViewPos, 1.0);
-  vec3 voronoi = texture(colortex10,texcoord).rgb;
 	vec3 currentSunlight = getSunlightColor(float(worldTime));
 	vec3 shadow = getSoftShadow(shadowClipPos);
   float waterMask = texture(colortex6, texcoord).g;

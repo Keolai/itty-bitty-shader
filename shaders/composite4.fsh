@@ -1,11 +1,13 @@
 #version 430 compatibility
 #include /lib/distort.glsl
+#include /lib/dayCycle.glsl
 
 #define SHADOW_QUALITY 2
 #define SHADOW_SOFTNESS 1
 #define SUNRISE 23215
 #define SUNSET 12785
 #define MAX_TIME 23999
+#define ITERATIONS 10
 
 uniform sampler2D colortex0;
 uniform sampler2D colortex1;
@@ -29,12 +31,17 @@ uniform mat4 shadowProjection;
 uniform vec3 eyePosition;
 uniform float viewHeight;
 uniform float viewWidth;
+uniform sampler2D colortex10;
+uniform int frameCounter;
 
 const int shadowMapResolution = 2048;
-const int nsamples = 20;
+const int nsamples = 30;
+const vec3 sunlightColor = vec3(1, 0.976, 0.863);
+const vec3 nightColor = vec3(0.349, 0.529, 0.8);
 
 
 in vec2 texcoord;
+uniform int worldTime;
 
 /* RENDERTARGETS: 0,9 */
 layout(location = 0) out vec4 color;
@@ -43,6 +50,37 @@ layout(location = 0) out vec4 color;
 vec3 projectAndDivide(mat4 projectionMatrix, vec3 position){
   vec4 homPos = projectionMatrix * vec4(position, 1.0);
   return homPos.xyz / homPos.w;
+}
+
+vec4 getNoise(vec2 coord){
+  ivec2 screenCoord = ivec2(coord * vec2(viewWidth, viewHeight)); // exact pixel coordinate onscreen
+  ivec2 noiseCoord = screenCoord % 256; // wrap to range of noiseTextureResolution
+  return texelFetch(colortex10, noiseCoord, 0);
+}
+
+vec3 getSunlightColor(float time){
+	float dayNightMix = sin(time/3694.78); //1 is daytime, -1 is night time
+	dayNightMix = (dayNightMix/2.0) + 0.5;
+	return mix(nightColor, sunlightColor, dayNightMix);
+
+}
+
+vec3 Blur(vec2 uv, float radius)
+{
+	radius = radius * .04;
+    
+    vec2 circle = vec2(radius) * vec2((viewHeight / viewWidth), 1.0);
+    
+	// Remove the time reference to prevent random jittering if you don't like it.
+	//vec2 random = vec(interleavedGradientNoise(uv));
+
+    // Do the blur here...
+	vec3 acc = vec3(0.0);
+	for (int i = 0; i < ITERATIONS; i++)
+    {
+		acc += texture(colortex9, uv + circle, radius*10.0).xyz;
+    }
+	return acc / float(ITERATIONS);
 }
 
 
@@ -58,11 +96,13 @@ void main() { //this controlls the light stuf
 	vec4 clipLightVector = gbufferProjection * vec4(shadowLightPosition,1.0);
     vec3 ndcLight = clipLightVector.xyz / clipLightVector.w;
     vec3 screenLight = ndcLight * 0.5 + 0.5;
-    vec3 screenPos = screenLight * vec3(viewWidth,viewHeight,1.0);
     vec2 center = screenLight.xy;
 	float blurStart = 0.5;
     float blurWidth = 0.5;
-
+    float noise = getNoise(texcoord).r;
+    vec3 lightColor = getSunlightColor(float(worldTime));
+    float dayNight = dayOrNight(float(worldTime));
+    float sunsetTimer = getSunset(float(worldTime));
     
 	vec2 uv = texcoord.xy;
     
@@ -73,13 +113,14 @@ void main() { //this controlls the light stuf
     for(int i = 0; i < nsamples; i++)
     {
         float scale = blurStart + (float(i)* precompute);
-        preColor += texture(colortex9, uv * scale + center);
+        preColor += texture(colortex9, uv * scale + center) * vec4(noise/4 + 0.75);
     }
-    
+   // Blur(texcoord, 0.5);
     
     preColor /= float(nsamples);
+    vec3 addColor = (preColor.rgb *lightColor * vec3(max(dayNight,0.01) * dayNight))/5;
     
-	color.rgb += preColor.rgb/4;
+	color.rgb += addColor;
     //color.rgb = skyMap.rgb;
 	
 	//color.rgb = vec3(lightDistance);

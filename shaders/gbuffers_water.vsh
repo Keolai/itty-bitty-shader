@@ -1,4 +1,5 @@
 #version 430 compatibility
+#define ITERATIONS 10
 
 out vec2 lmcoord;
 out vec2 texcoord;
@@ -18,6 +19,15 @@ uniform vec3 cameraPosition;
 uniform int frameCounter;
 uniform sampler2D noisetex;
 
+//https://www.shadertoy.com/view/MdXyzX
+vec2 wavedx(vec2 position, vec2 direction, float frequency, float timeshift) {
+  float x = dot(direction, position) * frequency + timeshift;
+  float wave = exp(sin(x) - 1.0);
+  float dx = wave * cos(x);
+  return vec2(wave, -dx);
+}
+
+
 void main() {
 	gl_Position = ftransform();
 	texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
@@ -31,23 +41,26 @@ void main() {
 	vec4 position = viewpos;
 	position.xyz += cameraPosition.xyz;
 	float frames = float(frameCounter)/15;
-	noise = texture(noisetex, (position.xz * vec2(0.05) + vec2(frames/40))).rgb;
-	//offset = exp(sin(frames + position.x + noise.r));
-	float sumOfSines = sin(position.x * 10 + noise.r + frames) * 1.5 + sin(position.x * 9 + 1.6*frames)
-	 + 0.5 * sin(position.x *5 + 3*frames);
-	offset = sumOfSines;
-	float slope =1.5 * cos(position.x * 10 + noise.r + frames) - sin(position.z + noise.r);
-	//normal.x += -slope ;
+	float iter = 0;
+	float sumOfValues = 0.0;
+	float normalSum = 0.0;
+	float freq = 0.1;
+	for (int i = 0; i < ITERATIONS; i++){
+		vec2 dir = vec2(sin(iter),cos(iter));
+		vec2 res = wavedx(position.xz * 10,dir,freq,frames);
+		sumOfValues += res.x;
+		normalSum += res.y;
+		freq *= 1.18;
+		iter += 1.15;
+	}	
 
-	//offset = noise.r/2.;
-	//normal = gl_NormalMatrix * gl_Normal; // this gives us the normal in view space
-	//normal = mat3(gbufferModelViewInverse) * normal; // this converts the normal to world/player space
-	//blockID = int(mc_Entity.x);
-			position.y += offset/40;
-			//position.z += offset/40;
+	position.y += sumOfValues/10 - 0.5;
+	normal.x += normalSum;
 			worldPos = position.xyz;
 			position.xyz -= cameraPosition.xyz;
 			gl_Position = (gl_ProjectionMatrix * gbufferModelView * position); //seus type conversion
 			//gl_Position.xyz /= gl_Position.w;
 
 }
+
+//
