@@ -40,22 +40,24 @@ void main() {
 	vec4 viewpos = gbufferModelViewInverse * gl_ModelViewMatrix * gl_Vertex;
 	vec4 position = viewpos;
 	position.xyz += cameraPosition.xyz;
-	float frames = float(frameCounter)/15;
+	float frames = float(frameCounter)/10;
 	float iter = 0;
 	float sumOfValues = 0.0;
-	float normalSum = 0.0;
+	vec3 normalSum = vec3(0.0);
 	float freq = 0.1;
 	for (int i = 0; i < ITERATIONS; i++){
 		vec2 dir = vec2(sin(iter),cos(iter));
-		vec2 res = wavedx(position.xz * 10,dir,freq,frames);
+		vec2 res = wavedx(position.xz * 20,dir,freq,frames);
 		sumOfValues += res.x;
-		normalSum += res.y;
+		normalSum += vec3(dir.x *freq * res.y, dir.y * freq * res.y, freq * res.x);
 		freq *= 1.18;
 		iter += 1.15;
 	}	
 
-	position.y += sumOfValues/10 - 0.5;
-	normal.x += normalSum;
+	position.y += sumOfValues/12 - 0.5;
+	normal.x += normalSum.x/2;
+	normal.z += normalSum.y/2;
+	offset = sumOfValues/10;
 			worldPos = position.xyz;
 			position.xyz -= cameraPosition.xyz;
 			gl_Position = (gl_ProjectionMatrix * gbufferModelView * position); //seus type conversion

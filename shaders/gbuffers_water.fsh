@@ -30,8 +30,9 @@ void main() {
 	vec3 worldLightVector = mat3(gbufferModelViewInverse) * lightVector;
 	float specular = dot(normal, worldLightVector); //issue
 	//color += clamp(specular,0,1);
-	specularity = vec4(clamp((specular * 2),0,1),1,0,1) ;
+	specularity = vec4(max(0.0, offset - 0.4) * 6,1,0,1) ;
 		color.a *= 0.4;
+		//color.rgb += vec3(max(0.0, offset - 0.5) * 2);
 	//vec3 specColor = specular;
 	//color.rgb += vec3(offset/4);
 	//color.gb += vec2(offset/5);

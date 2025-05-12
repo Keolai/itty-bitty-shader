@@ -37,7 +37,7 @@ uniform int frameCounter;
 uniform float rainStrength;
 
 const int shadowMapResolution = 2048;
-const int nsamples = 30;
+const int nsamples = 20;
 const vec3 sunlightColor = vec3(1, 0.976, 0.863);
 const vec3 nightColor = vec3(0.349, 0.529, 0.8);
 

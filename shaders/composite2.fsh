@@ -165,8 +165,6 @@ void main() {
     color.rgb += sunlight * clamp((min(pow(texture(colortex6,texcoord).r * 1.2,10),1.0) *(1- (depth)) * 4),0,1) * shadow; //water highlights
 	  color.rgb *= blocklight + skylight + ambient + sunlight*float(1.) + blueLight + purpLight;
     color.rgb *= eyeWaterColors[isEyeInWater];
-   // color.rgb = texture(colortex1, texcoord).rgb;
-   // color.rgb = vec3((1 - depth) * 2);
-//color.rgb = vec3(getSunset(float(worldTime))- 0.5);
+  //color.rgb = normal.rgb;
 }
 //terrain_solid: terrain_solid: 0(48) : error C1503: undefined variable "blueLighData"
