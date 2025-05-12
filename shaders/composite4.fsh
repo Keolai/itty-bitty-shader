@@ -23,6 +23,7 @@ uniform float far;
 
 uniform vec3 shadowLightPosition;
 uniform mat4 gbufferModelViewInverse;
+uniform int biome_category;
 
 uniform mat4 gbufferProjectionInverse;
 uniform mat4 gbufferProjection;
@@ -33,6 +34,7 @@ uniform float viewHeight;
 uniform float viewWidth;
 uniform sampler2D colortex10;
 uniform int frameCounter;
+uniform float rainStrength;
 
 const int shadowMapResolution = 2048;
 const int nsamples = 30;
@@ -65,22 +67,11 @@ vec3 getSunlightColor(float time){
 
 }
 
-vec3 Blur(vec2 uv, float radius)
-{
-	radius = radius * .04;
-    
-    vec2 circle = vec2(radius) * vec2((viewHeight / viewWidth), 1.0);
-    
-	// Remove the time reference to prevent random jittering if you don't like it.
-	//vec2 random = vec(interleavedGradientNoise(uv));
+float screenDistance(vec2 start, vec2 end){
+    float xDif = start.x - end.x;
+    float yDif = start.y - end.y;
 
-    // Do the blur here...
-	vec3 acc = vec3(0.0);
-	for (int i = 0; i < ITERATIONS; i++)
-    {
-		acc += texture(colortex9, uv + circle, radius*10.0).xyz;
-    }
-	return acc / float(ITERATIONS);
+    return sqrt(pow(xDif,2.) + pow(yDif,2.))/2;
 }
 
 
@@ -103,6 +94,7 @@ void main() { //this controlls the light stuf
     vec3 lightColor = getSunlightColor(float(worldTime));
     float dayNight = dayOrNight(float(worldTime));
     float sunsetTimer = getSunset(float(worldTime));
+    float dis = screenDistance(center,texcoord);
     
 	vec2 uv = texcoord.xy;
     
@@ -118,10 +110,10 @@ void main() { //this controlls the light stuf
    // Blur(texcoord, 0.5);
     
     preColor /= float(nsamples);
-    vec3 addColor = (preColor.rgb *lightColor * vec3(max(dayNight,0.01) * dayNight))/5;
-    
-	color.rgb += addColor;
-    //color.rgb = skyMap.rgb;
+    vec3 addColor = (preColor.rgb *lightColor * vec3(max(dayNight,0.01) * dayNight))/8;
+    float rain = float(min(rainStrength,1) == 0);
+	color.rgb += addColor * vec3(rain) * max((1. - dis),0);
+    //color.rgb = vec3(1 - dis);
 	
 	//color.rgb = vec3(lightDistance);
 }
