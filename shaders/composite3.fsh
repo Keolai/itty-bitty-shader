@@ -146,7 +146,7 @@ void main() { //fog
     float proxDepth = clamp(dist * 1.5, 0., 1.0);
     mixedFog *= eyeWaterColors[isEyeInWater];
     mixedFog = mixedFog * (1 - waterMask) + mix(nightWaterFog,waterFogColor,dayOrNight(float(worldTime))) * waterMask;
-    mixedFog = mix(mixedFog,sunOrMoonFog,sunAmount * float(hasSkylight));
+    mixedFog = mix(mixedFog,sunOrMoonFog,sunAmount * float(hasSkylight) * min((1.1 - waterMask),1.0)); //turn off for water?
     if (isEyeInWater > 1){
       mixedFog = eyeWaterColors[isEyeInWater];
     }

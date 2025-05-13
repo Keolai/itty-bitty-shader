@@ -55,8 +55,8 @@ void main() {
 	}	
 
 	position.y += sumOfValues/12 - 0.5;
-	normal.x += normalSum.x/2;
-	normal.z += normalSum.y/2;
+	// normal.x += normalSum.x/2;
+	// normal.z += normalSum.y/2;
 	offset = sumOfValues/10;
 			worldPos = position.xyz;
 			position.xyz -= cameraPosition.xyz;

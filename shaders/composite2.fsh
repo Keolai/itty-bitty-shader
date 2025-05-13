@@ -21,6 +21,7 @@ uniform sampler2D colortex6;
 uniform sampler2D colortex7;
 
 uniform int isEyeInWater;
+uniform int biome_category;
 
 uniform int heldItemId;
 
@@ -132,8 +133,7 @@ void main() {
   		return;
 	}
 	
-
-	vec3 lightVector = normalize(shadowLightPosition);
+  vec3 lightVector = normalize(shadowLightPosition);
 	vec3 worldLightVector = mat3(gbufferModelViewInverse) * lightVector;
    // float dayCycle = dayOrNight(float(worldTime));
 

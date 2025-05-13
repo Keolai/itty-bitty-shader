@@ -35,9 +35,10 @@ uniform float viewWidth;
 uniform sampler2D colortex10;
 uniform int frameCounter;
 uniform float rainStrength;
+uniform bool hasSkylight;
 
 const int shadowMapResolution = 2048;
-const int nsamples = 20;
+const int nsamples = 15;
 const vec3 sunlightColor = vec3(1, 0.976, 0.863);
 const vec3 nightColor = vec3(0.349, 0.529, 0.8);
 
@@ -110,9 +111,9 @@ void main() { //this controlls the light stuf
    // Blur(texcoord, 0.5);
     
     preColor /= float(nsamples);
-    vec3 addColor = (preColor.rgb *lightColor * vec3(max(dayNight,0.01) * dayNight))/8;
+    vec3 addColor = (preColor.rgb *lightColor * vec3(max(dayNight,0.01) * dayNight))/4;
     float rain = float(min(rainStrength,1) == 0);
-	color.rgb += addColor * vec3(rain) * max((1. - dis),0);
+	color.rgb += addColor * vec3(rain) * max((1. - dis),0) * float(hasSkylight);
     //color.rgb = vec3(1 - dis);
 	
 	//color.rgb = vec3(lightDistance);

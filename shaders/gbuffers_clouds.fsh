@@ -10,6 +10,9 @@ in vec2 texcoord;
 in vec4 glcolor;
 in vec3 normal;
 
+uniform vec3 shadowLightPosition;
+uniform mat4 gbufferModelViewInverse;
+
 /* RENDERTARGETS: 0,1,2 */
 layout(location = 0) out vec4 color;
 layout(location = 1) out vec4 lightmapData;
@@ -17,12 +20,16 @@ layout(location = 2) out vec4 encodedNormal;
 
 void main() {
 	color = texture(gtexture, texcoord) * glcolor; //biome tint
-	//color *= texture(lightmap, lmcoord); //lightmap
+	color *= texture(lightmap, lmcoord); //lightmap
 	if (color.a < alphaTestRef) {
 		discard;
 	}
+
+	vec3 lightVector = normalize(shadowLightPosition);
+	vec3 worldLightVector = mat3(gbufferModelViewInverse) * lightVector;
+
 	//color.rgb = normal; //write normals to color
-	//lightmapData = vec4(lmcoord, 0.0, 1.0);
-	//encodedNormal = vec4(normal * 0.5 + 0.5, 1.0);
+	lightmapData = vec4(lmcoord, 0.0, 1.0);
+	encodedNormal = vec4(normal * 0.5 + 0.5, 1.0);
 	//color = encodedNormal;
 }
