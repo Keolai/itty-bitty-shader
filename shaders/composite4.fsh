@@ -2,6 +2,8 @@
 #include /lib/distort.glsl
 #include /lib/dayCycle.glsl
 
+#define GODRAYS
+
 #define SHADOW_QUALITY 2
 #define SHADOW_SOFTNESS 1
 #define SUNRISE 23215
@@ -78,6 +80,7 @@ float screenDistance(vec2 start, vec2 end){
 
 
 void main() { //this controlls the light stuf
+#ifdef GODRAYS
 	color = texture(colortex0, texcoord);
     float depth = texture(depthtex0, texcoord).r;
     vec3 lightmap = texture(colortex1,texcoord).rgb;
@@ -115,7 +118,10 @@ void main() { //this controlls the light stuf
     float rain = float(min(rainStrength,1) == 0);
 	color.rgb += addColor * vec3(rain) * max((1. - dis),0) * float(hasSkylight);
     //color.rgb = vec3(1 - dis);
-	
+#endif
+#ifndef GODRAYS
+    color = texture(colortex0, texcoord);
+#endif
 	//color.rgb = vec3(lightDistance);
 }
 

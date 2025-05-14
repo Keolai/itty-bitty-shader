@@ -4,6 +4,7 @@ out vec2 lmcoord;
 out vec2 texcoord;
 out vec4 glcolor;
 out vec3 normal;
+out vec3 viewNormal; 
 
 uniform mat4 gbufferModelViewInverse;
 
@@ -14,6 +15,7 @@ void main() {
 	lmcoord = (lmcoord * 33.05 / 32.0) - (1.05 / 32.0);
 
 	normal = gl_NormalMatrix * gl_Normal; // this gives us the normal in view space
+	viewNormal = normal;
 	normal = mat3(gbufferModelViewInverse) * normal; // this converts the normal to world/player space
 	glcolor = gl_Color;
 }
