@@ -2,6 +2,7 @@
 
 uniform sampler2D lightmap;
 uniform sampler2D gtexture;
+//uniform sampler2D depthtex0;
 #include /lib/cl/common.glsl
 
 
@@ -57,6 +58,7 @@ void main() {
 	//color.rgb = normal; //write normals to color
 	//color.rgb = vec3(blockID); 
 	encodedNormal = vec4(normal * 0.5 + 0.5, 1.0);
+	//color.rgb = texture(depthtex0,texcoord).rgb/2.;
 	//color = encodedNormal;
 }
 

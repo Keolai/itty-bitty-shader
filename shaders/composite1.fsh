@@ -6,10 +6,12 @@
 uniform sampler2D colortex0;
 uniform sampler2D colortex1;
 uniform sampler2D colortex2;
+uniform sampler2D colortex3;
 // uniform sampler2D colortex6;
 uniform sampler2D colortex4;
 
 in vec2 texcoord;
+uniform vec3 skyColor;
 
 /* RENDERTARGETS: 0 */
 layout(location = 0) out vec4 color;
@@ -32,9 +34,10 @@ void main() { //this controlls the light stuf
     vec4 worldPos = gbufferModelViewInverse * vec4(viewPos, 1.0);
     vec3 viewVect = normalize(worldPos.xyz);
     vec3 rayDirection = normalize(reflect(viewVect, normal));
+    float dist = 0;
     //vec3 hitPos = vec3(0.);
     if (waterMask == 1){ //only reflect on water
-       vec2 reflectionUV = raytrace(worldPos.xyz,rayDirection,50);
+       vec2 reflectionUV = raytrace(worldPos.xyz,rayDirection,50,dist);
        if (reflectionUV.x > 0.1){
         color = mix(color,texture(colortex0,reflectionUV),0.5);
        }

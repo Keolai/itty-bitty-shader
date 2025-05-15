@@ -58,7 +58,7 @@ float random01(vec2 st) {
     return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
 }
 
-vec2 raytrace(vec3 startPosition, vec3 reflectionDir, int maxIter) {
+vec2 raytrace(vec3 startPosition, vec3 reflectionDir, int maxIter, out float dist) {
     vec3 currPos = vec3(0.0);
     vec3 currUV = vec3(0.0);
     float currLength = 10.0;
@@ -87,6 +87,7 @@ vec2 raytrace(vec3 startPosition, vec3 reflectionDir, int maxIter) {
         // March along ray
         vec3 newPos = getWorldPosition(currUV.xy, currDepth);
         currLength = length(newPos - startPosition);
+        dist = currLength;
     }
 
     return vec2(-2);
