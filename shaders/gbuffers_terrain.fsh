@@ -39,6 +39,8 @@ void main() {
 	if (color.a < alphaTestRef) {
 		discard;
 	}
+	vec2 newLm = lmcoord;
+	newLm.x *= 0.5;
 
 	//int blockId = int(mc_Entity.x);
 	switch (blockID){
@@ -52,7 +54,7 @@ void main() {
 		purpleLightData = vec4(lmcoord, 0.0, 1.0);
 		break;
 		default:
-		lightmapData = vec4(lmcoord, 0.0, 1.0);
+		lightmapData = vec4(newLm, 0.0, 1.0);
 		break;
 	}
 	//color.rgb = normal; //write normals to color

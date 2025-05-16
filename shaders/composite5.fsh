@@ -115,7 +115,7 @@ void main() { //this controlls the light stuf
     // Output to screen
     newColor /= Quality * Directions - 15.0;
     //float brightness = (newColor.x + newColor.y + newColor.z)/3;
-    color.rgb += vec3(newColor / 4) * getSunlightColor(float(worldTime));
+    color.rgb += vec3(newColor / 3) * getSunlightColor(float(worldTime));
     //color.rgb = vec3(1 - dis);
 #endif
 #ifndef GODRAYS

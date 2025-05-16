@@ -145,7 +145,7 @@ void main() {
 	vec3 feetPlayerPos = (gbufferModelViewInverse * vec4(viewPos, 1.0)).xyz;
 	vec3 shadowViewPos = (shadowModelView * vec4(feetPlayerPos, 1.0)).xyz;
 	 float dist = length(viewPos) / far; //change to get depth from player 0 is close
-	vec3 blocklight = lightmap.r * blocklightColor; //torches 
+	vec3 blocklight = lightmap.r * blocklightColor * 0.5; //torches 
     vec3 blueLight = blueMap.r * blueLightColor;
     vec3 purpLight = purpleMap.r * purpleLightColor;
 	vec4 shadowClipPos = shadowProjection * vec4(shadowViewPos, 1.0);

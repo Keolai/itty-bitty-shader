@@ -6,6 +6,8 @@ uniform sampler2D colortex0;
 in vec2 texcoord;
 out vec4 color;
 
+uniform int viewWidth;
+
 const float Pi = 6.28318530718; // Pi*2
     
     // GAUSSIAN BLUR SETTINGS {{{
@@ -40,11 +42,17 @@ void main() {
         }
     }
     
+    vec4 exposure = textureLod(colortex0, vec2(0.5),float(viewWidth)); //dynamic bloom
     // Output to screen
     newColor /= Quality * Directions - 15.0;
-    float brightness = (newColor.x + newColor.y + newColor.z)/3;
-    color.rgb += newColor.rgb * 0.02;
+    float brightness = (exposure.x + exposure.y + exposure.z)/3;
+    //color.rgb += newColor.rgb * ((1 - brightness)/20 + 0.01);
+    color.rgb += newColor.rgb * 0.01;
+   // color.rgb = vec3(exposure.r);
     #endif
+
+    //composite6.fsh: composite6.fsh: 0(32) : error C1503: undefined variable "GL_MAX_TEXTURE_SIZE"
+
 
     #ifndef BLOOM
     color = texture(colortex0,texcoord);
@@ -53,3 +61,4 @@ void main() {
 
 //composite5.fsh: composite5.fsh: 0(58) : error C7011: implicit cast from "float" to "vec2"
 
+//

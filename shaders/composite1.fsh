@@ -21,6 +21,13 @@ vec3 projectAndDivide(mat4 projectionMatrix, vec3 position){
   return homPos.xyz / homPos.w;
 }
 
+float screenDistance(vec2 start, vec2 end){
+    float xDif = start.x - end.x;
+    float yDif = start.y - end.y;
+
+    return sqrt(pow(xDif,2.) + pow(yDif,2.))/2;
+}
+
 void main() { //this controlls the light stuf
 #ifdef REFLECTIONS
 	color = texture(colortex0, texcoord);
@@ -35,11 +42,12 @@ void main() { //this controlls the light stuf
     vec3 viewVect = normalize(worldPos.xyz);
     vec3 rayDirection = normalize(reflect(viewVect, normal));
     float dist = 0;
+    //float screenDist = screenDistance(vec2(0.5),texcoord);
     //vec3 hitPos = vec3(0.);
     if (waterMask == 1){ //only reflect on water
        vec2 reflectionUV = raytrace(worldPos.xyz,rayDirection,50,dist);
        if (reflectionUV.x > 0.1){
-        color = mix(color,texture(colortex0,reflectionUV),0.5);
+        color = mix(color,texture(colortex0,reflectionUV),0.2);
        }
     }
    // color.rgb = vec3(viewVect.y)

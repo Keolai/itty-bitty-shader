@@ -27,7 +27,9 @@ uniform mat4 gbufferModelViewInverse;
 uniform mat4 gbufferProjectionInverse;
 uniform mat4 shadowModelView;
 uniform mat4 shadowProjection;
-uniform vec3 eyePosition;
+uniform vec3 cameraPosition;
+uniform int heldBlockLightValue;
+uniform int heldBlockLightValue2;
 
 const int shadowMapResolution = 2048;
 
@@ -68,22 +70,26 @@ void main() { //this controlls the light stuf
 	vec3 feetPlayerPos = (gbufferModelViewInverse * vec4(viewPos, 1.0)).xyz;
 	vec3 shadowViewPos = (shadowModelView * vec4(feetPlayerPos, 1.0)).xyz;
 	 float dist = length(viewPos) / far; //change to get depth from player 0 is close
-	float lightDistance = 1.0 - min(dist * 20,1.0);
-	
-	if (heldItemId == 2 || heldItemId2 == 2){ //holding a torch, maybe change from if statement
-		float heldLight = clamp((5./length(feetPlayerPos)) - 0.3,0.0,100.0); //need to fix
-		float totalLight= lightmap.r + heldLight * 32.;
-		//lightmap.r = (max(totalLight,lightmap.r));
-		lightmap.r = (lightDistance * 32) * (33.05 / 32.0) - (1.05 / 32.0) + lightmap.r;
-		//lightmap.g = lightDistance;
-	}
+	vec3 playerPosLight = feetPlayerPos + cameraPosition;
+	float lightDistance = length(playerPosLight);
 
-	if (heldItemId == 3 || heldItemId2 == 3){ //holding a torch, maybe change from if statement
-		float heldLight = clamp((5./length(feetPlayerPos)) - 0.3,0.0,32.0);
-		float totalLight= clamp(bluelightmap.r + heldLight * 1.5,0.0,32.0);
-		bluelightmap.r = (max(totalLight,bluelightmap.r));
-		bluelightmap.r = clamp(bluelightmap.r,0.,32.);
-	}
+	//lightmap.r = max(min(max(heldBlockLightValue,heldBlockLightValue2),15),lightmap.r); //fixes the yellow bullshit
+	
+	// if (heldItemId == 2 || heldItemId2 == 2){ //holding a torch, maybe change from if statement
+	// 	float heldLight = clamp((5./length(feetPlayerPos)) - 0.3,0.0,100.0); //need to fix
+	// 	float totalLight= lightmap.r + heldLight * 32.;
+	// 	//lightmap.r = (max(totalLight,lightmap.r));
+	// 	lightmap.r = (lightDistance * 32) * (33.05 / 32.0) - (1.05 / 32.0) + lightmap.r;
+	// 	//lightmap.g = lightDistance;
+	// }
+	//
+
+	// if (heldItemId == 3 || heldItemId2 == 3){ //holding a torch, maybe change from if statement
+	// 	float heldLight = clamp((5./length(feetPlayerPos)) - 0.3,0.0,32.0);
+	// 	float totalLight= clamp(bluelightmap.r + heldLight * 1.5,0.0,32.0);
+	// 	bluelightmap.r = (max(totalLight,bluelightmap.r));
+	// 	bluelightmap.r = clamp(bluelightmap.r,0.,32.);
+	// }
 
 	lightmapData = vec4(lightmap, 0.0, 1.0);
 	blueLightData = vec4(bluelightmap, 0.0, 1.0);
