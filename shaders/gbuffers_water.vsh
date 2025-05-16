@@ -8,6 +8,9 @@ out vec3 normal;
 out float offset; 
 out vec3 worldPos;
 out vec3 noise;
+out vec3 entity;
+
+in vec3 mc_Entity;
 
 uniform mat4 gbufferModelView;
 uniform mat4 gbufferModelViewInverse;
@@ -37,6 +40,9 @@ void main() {
 	normal = gl_NormalMatrix * gl_Normal; // this gives us the normal in view space
 	normal = mat3(gbufferModelViewInverse) * normal; // this converts the normal to world/player space
 	glcolor = gl_Color;
+	entity = mc_Entity;
+	if (mc_Entity.x == 7){
+
 	vec4 viewpos = gbufferModelViewInverse * gl_ModelViewMatrix * gl_Vertex;
 	vec4 position = viewpos;
 	position.xyz += cameraPosition.xyz;
@@ -54,7 +60,7 @@ void main() {
 		iter += 1.15;
 	}	
 
-	position.y += sumOfValues/12 - 0.5;
+	position.y += sumOfValues/20 - 0.5;
 	// normal.x += normalSum.x/2;
 	// normal.z += normalSum.y/2;
 	offset = sumOfValues/10;
@@ -62,7 +68,7 @@ void main() {
 			position.xyz -= cameraPosition.xyz;
 			gl_Position = (gl_ProjectionMatrix * gbufferModelView * position); //seus type conversion
 			//gl_Position.xyz /= gl_Position.w;
-
+	}
 }
 
 //

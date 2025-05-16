@@ -14,6 +14,8 @@ in vec4 glcolor;
 in vec3 normal;
 in float offset;
 in vec3 noise;
+in vec3 entity;
+
 
 /* RENDERTARGETS: 0,1,2,6,7 */
 layout(location = 0) out vec4 color;
@@ -28,9 +30,14 @@ void main() {
 	float depth = texture(depthtex0, texcoord).r;
 	vec3 lightVector = normalize(shadowLightPosition);
 	vec3 worldLightVector = mat3(gbufferModelViewInverse) * lightVector;
-	float specular = dot(normal, worldLightVector); //issue
+	//float specular = dot(normal, worldLightVector); //issue
 	//color += clamp(specular,0,1);
-	specularity = vec4(max(0.0, offset - 0.4) * 6,1,0,1) ;
+	if (entity.x == 7){
+		specularity = vec4(clamp(offset - 0.4,0.0,1.0) * 6,1,0,1) ;//issue for ice
+	} else {
+		specularity = vec4(0,1,0,1);
+	}
+	waterMask = vec4(1.0,0.0,0.0,0.0);
 		color.a *= 0.4;
 		//color.rgb += vec3(max(0.0, offset - 0.5) * 2);
 	//vec3 specColor = specular;
@@ -42,7 +49,6 @@ void main() {
 	}
 	lightmapData = vec4(lmcoord, 0.0, 1.0);
 	encodedNormal = vec4(normal * 0.5 + 0.5, 1.0);
-	waterMask = vec4(1.0,0.0,0.0,0.0);
 	//color.rgb = normal.rgb;
 	//color = waterMask;
 	//color = specularity;

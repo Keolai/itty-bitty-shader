@@ -1,6 +1,7 @@
 #version 430 compatibility
 #include /lib/distort.glsl
 #include /lib/dayCycle.glsl
+#include /colors/lightingColors.glsl
 
 #define SHADOW_QUALITY 2
 #define SHADOW_SOFTNESS 1
@@ -38,18 +39,6 @@ uniform vec3 eyePosition;
 uniform float ambientLight;
 uniform bool hasSkylight;
 
-const vec3 blocklightColor = vec3(1.0, 0.5, 0.08);
-const vec3 blueLightColor = vec3(0.616, 0.812, 1);
-const vec3 purpleLightColor = vec3(0.973, 0.616, 1);
-const vec3 skylightColor = vec3(0.05, 0.15, 0.3);
-const vec3 sunlightColor = vec3(1, 0.976, 0.863);
-const vec3 ambientColor = vec3(0.1);
-const int shadowMapResolution = 2048;
-const vec3 nightColor = vec3(0.349, 0.529, 0.8);
-const vec3 sunsetColor = vec3(0.922, 0.42, 0);
-
-const vec3 eyeWaterColors[4] = vec3[4](vec3(1.), vec3(0.4, 0.675, 0.941), vec3(0.929, 0.439, 0),vec3(0.941, 0.655, 0.4));
-
 in vec2 texcoord;
 
 /* RENDERTARGETS: 0 */
@@ -58,6 +47,9 @@ layout(location = 0) out vec4 color;
 vec3 getSunlightColor(float time){
 	float dayNightMix = sin(time/3694.78); //1 is daytime, -1 is night time
 	dayNightMix = (dayNightMix/2.0) + 0.5;
+  if (biome_category == CAT_ICY){
+    return mix(nightColor, coldBiomeSun, dayNightMix);
+  }
 	return mix(nightColor, sunlightColor, dayNightMix);
 
 }
@@ -87,7 +79,7 @@ vec3 getShadow(vec3 shadowScreenPos){
 
   if(opaqueShadow == 0.0){
     // there is a shadow cast by something opaque, so we return no sunlight
-    return vec3(0.0);
+    return shadowColorBl;
   }
 
   // contains the color and alpha (transparency) of the thing casting a shadow
@@ -160,7 +152,7 @@ void main() {
 	vec3 currentSunlight = getSunlightColor(float(worldTime));
 	vec3 shadow = getSoftShadow(shadowClipPos);
   float waterMask = texture(colortex6, texcoord).g;
-	vec3 sunlight = max(currentSunlight * dot(normal, worldLightVector) * shadow,vec3(0.0));
+	vec3 sunlight = clamp(currentSunlight * dot(normal, worldLightVector) * shadow,vec3(0.0),vec3(1.));
     sunlight += max(getSunset(float(worldTime)) - 0.5,0.) * sunsetColor; //sunset
     color.rgb += sunlight * clamp((min(pow(texture(colortex6,texcoord).r * 1.2,10),1.0) *(1- (depth)) * 4),0,1) * shadow; //water highlights
 	  color.rgb *= blocklight + skylight + ambient + sunlight*float(1.) + blueLight + purpLight;

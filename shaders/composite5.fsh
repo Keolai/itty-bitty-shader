@@ -1,7 +1,7 @@
 #version 430 compatibility
 #include /lib/distort.glsl
 #include /lib/dayCycle.glsl
-
+#include /colors/lightingColors.glsl
 #define GODRAYS
 
 #define SHADOW_QUALITY 2
@@ -39,17 +39,21 @@ uniform int frameCounter;
 uniform float rainStrength;
 uniform bool hasSkylight;
 
-const int shadowMapResolution = 2048;
-const int nsamples = 15;
-const vec3 sunlightColor = vec3(1, 0.976, 0.863);
-const vec3 nightColor = vec3(0.349, 0.529, 0.8);
+const int nsamples = 20;
 
 
 in vec2 texcoord;
 uniform int worldTime;
 
-/* RENDERTARGETS: 0,9 */
+const float Pi = 6.28318530718; // Pi*2
+    
+    // GAUSSIAN BLUR SETTINGS {{{
+const float Directions = 8.0; // BLUR DIRECTIONS (Default 16.0 - More is better but slower)
+const float Quality = 3.0; // BLUR QUALITY (Default 4.0 - More is better but slower)
+
+/* RENDERTARGETS: 0,3 */
 layout(location = 0) out vec4 color;
+layout(location = 1) out vec4 rawRay;
 
 
 vec3 projectAndDivide(mat4 projectionMatrix, vec3 position){
@@ -81,42 +85,37 @@ float screenDistance(vec2 start, vec2 end){
 
 void main() { //this controlls the light stuf
 #ifdef GODRAYS
-	color = texture(colortex0, texcoord);
-    float depth = texture(depthtex0, texcoord).r;
-    vec3 lightmap = texture(colortex1,texcoord).rgb;
-   // vec4 skyMap = vec4(vec3(float (depth == 1.)),1.0);
-    //skyBuffer = skyMap;
-   // 
-    //vec3 lightVector = normalize(shadowLightPosition);
-	vec4 clipLightVector = gbufferProjection * vec4(shadowLightPosition,1.0);
-    vec3 ndcLight = clipLightVector.xyz / clipLightVector.w;
-    vec3 screenLight = ndcLight * 0.5 + 0.5;
-    vec2 center = screenLight.xy;
-	float blurStart = 0.5;
-    float blurWidth = 0.5;
-    float noise = getNoise(texcoord).r;
+	float ray = texture(colortex3, texcoord).b;
+    color = texture(colortex0,texcoord);
+    float newColor = ray;
     vec3 lightColor = getSunlightColor(float(worldTime));
-    float dayNight = dayOrNight(float(worldTime));
-    float sunsetTimer = getSunset(float(worldTime));
-    float dis = screenDistance(center,texcoord);
+    // float waterMask = texture(colortex6, texcoord).g;
+    // vec3 encodedNormal = texture(colortex2, texcoord).rgb;
+	// vec3 normal = normalize((encodedNormal - 0.5) * 2.0); // we normalize to make sure it is of unit length
+    // float depth = texture(depthtex0, texcoord).r;
+    // vec3 NDCPos = vec3(texcoord.xy, depth) * 2.0 - 1.0;
+	// vec3 viewPos = projectAndDivide(gbufferProjectionInverse, NDCPos);
+    // GAUSSIAN BLUR SETTINGS }}}
+   
+    vec2 Radius = vec2(0.01);
+    float dis = screenDistance(vec2(0.5),texcoord);
+    // Normalized pixel coordinates (from 0 to 1)
+    vec2 uv = texcoord;
+    // Pixel colour
     
-	vec2 uv = texcoord.xy;
-    
-    uv -= center;
-    float precompute = blurWidth * (1.0 / float(nsamples - 1));
-    
-    vec4 preColor = vec4(0.0);
-    for(int i = 0; i < nsamples; i++)
+    // Blur calculations
+    for( float d=0.0; d<Pi; d+=Pi/Directions)
     {
-        float scale = blurStart + (float(i)* precompute);
-        preColor += texture(colortex9, uv * scale + center) * vec4(noise/4 + 0.75);
+		for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality)
+        {
+			newColor += texture(colortex3, uv+vec2(cos(d),sin(d))*Radius*i).b;		
+        }
     }
-   // Blur(texcoord, 0.5);
     
-    preColor /= float(nsamples);
-    vec3 addColor = (preColor.rgb *lightColor * vec3(max(dayNight,0.01) * dayNight))/4;
-    float rain = float(min(rainStrength,1) == 0);
-	color.rgb += addColor * vec3(rain) * max((1. - dis),0) * float(hasSkylight);
+    // Output to screen
+    newColor /= Quality * Directions - 15.0;
+    //float brightness = (newColor.x + newColor.y + newColor.z)/3;
+    color.rgb += vec3(newColor / 4) * getSunlightColor(float(worldTime));
     //color.rgb = vec3(1 - dis);
 #endif
 #ifndef GODRAYS
@@ -128,6 +127,6 @@ void main() { //this controlls the light stuf
 //
 //composite1.fsh: composite1.fsh: 0(124) : error C1503: undefined variable "lightMap"
 //sky_textured: sky_textured: 0(32) : error C1503: undefined variable "lightData"
-
+//
 
 
