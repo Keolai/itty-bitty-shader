@@ -80,7 +80,7 @@ float screenDistance(vec2 start, vec2 end){
 
 
 
-void main() { //this controlls the light stuf
+void main() { //this controlls the initial godray
 #ifdef GODRAYS
 	color = texture(colortex0, texcoord);
     float depth = texture(depthtex0, texcoord).r;
@@ -119,7 +119,7 @@ void main() { //this controlls the light stuf
     float rain = float(min(rainStrength,1) == 0);
 	float rayVal = addColor.r * rain * max((1. - dis),0) * float(hasSkylight);
     vec4 rayBuffer = texture(colortex3,texcoord);
-    rawRay = vec4(rayBuffer.xy,rayVal * (1 - dis),1.0); //write back to colortex;
+    rawRay = vec4(rayBuffer.xy,rayVal * (1 - dis * 1.5),1.0); //write back to colortex;
 
     //color.rgb = vec3(1 - dis);
 #endif

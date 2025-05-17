@@ -48,7 +48,7 @@ uniform int worldTime;
 const float Pi = 6.28318530718; // Pi*2
     
     // GAUSSIAN BLUR SETTINGS {{{
-const float Directions = 8.0; // BLUR DIRECTIONS (Default 16.0 - More is better but slower)
+const float Directions = 6.0; // BLUR DIRECTIONS (Default 16.0 - More is better but slower)
 const float Quality = 3.0; // BLUR QUALITY (Default 4.0 - More is better but slower)
 
 /* RENDERTARGETS: 0,3 */
@@ -70,7 +70,7 @@ vec4 getNoise(vec2 coord){
 vec3 getSunlightColor(float time){
 	float dayNightMix = sin(time/3694.78); //1 is daytime, -1 is night time
 	dayNightMix = (dayNightMix/2.0) + 0.5;
-	return mix(nightColor, sunlightColor, dayNightMix);
+	return mix(nightColor, rayColor, dayNightMix);
 
 }
 
@@ -83,7 +83,7 @@ float screenDistance(vec2 start, vec2 end){
 
 
 
-void main() { //this controlls the light stuf
+void main() { //this controlls secondary blur
 #ifdef GODRAYS
 	float ray = texture(colortex3, texcoord).b;
     color = texture(colortex0,texcoord);
@@ -115,7 +115,7 @@ void main() { //this controlls the light stuf
     // Output to screen
     newColor /= Quality * Directions - 15.0;
     //float brightness = (newColor.x + newColor.y + newColor.z)/3;
-    color.rgb += vec3(newColor / 3) * getSunlightColor(float(worldTime));
+    color.rgb += vec3(newColor / 5) * getSunlightColor(float(worldTime));
     //color.rgb = vec3(1 - dis);
 #endif
 #ifndef GODRAYS

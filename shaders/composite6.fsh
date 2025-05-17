@@ -15,7 +15,7 @@ const float Directions = 10.0; // BLUR DIRECTIONS (Default 16.0 - More is better
 const float Quality = 2.0; // BLUR QUALITY (Default 4.0 - More is better but slower)
 
 //https://www.shadertoy.com/view/Xltfzj
-void main() { 
+void main() { //bloom pass
     #ifdef BLOOM
 	color = texture(colortex0, texcoord);
     vec4 newColor = color;

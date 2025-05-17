@@ -28,7 +28,7 @@ float screenDistance(vec2 start, vec2 end){
     return sqrt(pow(xDif,2.) + pow(yDif,2.))/2;
 }
 
-void main() { //this controlls the light stuf
+void main() { //this controlls reflection
 #ifdef REFLECTIONS
 	color = texture(colortex0, texcoord);
     float waterMask = texture(colortex6, texcoord).g;
@@ -40,6 +40,7 @@ void main() { //this controlls the light stuf
 	vec3 viewPos = projectAndDivide(gbufferProjectionInverse, NDCPos);
     vec4 worldPos = gbufferModelViewInverse * vec4(viewPos, 1.0);
     vec3 viewVect = normalize(worldPos.xyz);
+    //worldPos.y = -1;
     vec3 rayDirection = normalize(reflect(viewVect, normal));
     float dist = 0;
     //float screenDist = screenDistance(vec2(0.5),texcoord);

@@ -51,7 +51,7 @@ vec3 projectAndDivide(mat4 projectionMatrix, vec3 position){
 
 
 
-void main() { //this controlls the light stuf
+void main() { //this controls altering light map
 	color = texture(colortex0, texcoord);
 
 	float depth = texture(depthtex0, texcoord).r;

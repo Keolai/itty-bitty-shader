@@ -150,7 +150,7 @@ void main() {
     vec3 purpLight = purpleMap.r * purpleLightColor;
 	vec4 shadowClipPos = shadowProjection * vec4(shadowViewPos, 1.0);
 	vec3 currentSunlight = getSunlightColor(float(worldTime));
-	vec3 shadow = getSoftShadow(shadowClipPos);
+	vec3 shadow = getSoftShadow(shadowClipPos) * (1 - (dist * 1.5));
   float waterMask = texture(colortex6, texcoord).g;
 	vec3 sunlight = clamp(currentSunlight * dot(normal, worldLightVector) * shadow,vec3(0.0),vec3(1.));
     sunlight += max(getSunset(float(worldTime)) - 0.5,0.) * sunsetColor; //sunset
