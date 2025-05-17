@@ -71,7 +71,10 @@ void main() { //this controlls the light stuf
 	vec3 shadowViewPos = (shadowModelView * vec4(feetPlayerPos, 1.0)).xyz;
 	 float dist = length(viewPos) / far; //change to get depth from player 0 is close
 	vec3 playerPosLight = feetPlayerPos + cameraPosition;
+	float heldLight = max(float(heldBlockLightValue),float(heldBlockLightValue2));
 	float lightDistance = length(playerPosLight);
+	float light = max((pow(1- dist,15) * heldLight/18),lightmap.r);
+	lightmap.r = light;
 
 	//lightmap.r = max(min(max(heldBlockLightValue,heldBlockLightValue2),15),lightmap.r); //fixes the yellow bullshit
 	

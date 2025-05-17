@@ -41,7 +41,7 @@ void main() {
 	vec4 startLight = texture(lightmap, data.lightMapCoord);
 	float heldLight = max(float(heldBlockLightValue),float(heldBlockLightValue2));
 	float dist = length(data.worldPos - cameraPosition);
-	startLight.rgb = max(vec3(pow((far - dist)/(far),15) * heldLight/15),startLight.rgb);
+	startLight.rgb = max(vec3(pow((far - dist)/(far),18) * heldLight/15),startLight.rgb);
     color = applyColouredLight(color, startLight, data.worldPos, data.localChunkPos); //this is causing perf issues
 	if (color.a < alphaTestRef) {
 		discard;
