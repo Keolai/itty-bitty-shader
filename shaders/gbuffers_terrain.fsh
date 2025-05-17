@@ -2,18 +2,22 @@
 
 uniform sampler2D lightmap;
 uniform sampler2D gtexture;
+uniform float far;
 //uniform sampler2D depthtex0;
 #include /lib/cl/common.glsl
 
 
 uniform int blockEntityId;
 uniform float alphaTestRef = 0.1;
+uniform int heldBlockLightValue;
+uniform int heldBlockLightValue2;
 
 in vec2 lmcoord;
 in vec2 texcoord;
 in vec4 glcolor;
 in vec3 normal;
 flat in int blockID;
+// uniform vec3 cameraPosition;
 
 in fragment_data {
     vec2 textureCoord;
@@ -35,13 +39,14 @@ void main() {
 	color = texture(gtexture, texcoord) * glcolor; //biome tint
 	//color *= texture(lightmap, lmcoord); //lightmap
 	vec4 startLight = texture(lightmap, data.lightMapCoord);
+	float heldLight = max(float(heldBlockLightValue),float(heldBlockLightValue2));
+	float dist = length(data.worldPos - cameraPosition);
+	startLight.rgb = max(vec3(pow((far - dist)/(far),15) * heldLight/15),startLight.rgb);
     color = applyColouredLight(color, startLight, data.worldPos, data.localChunkPos); //this is causing perf issues
 	if (color.a < alphaTestRef) {
 		discard;
 	}
-	vec2 newLm = lmcoord;
-	newLm.x *= 0.5;
-
+	//color.rgb = data.worldPos - cameraPosition;
 	//int blockId = int(mc_Entity.x);
 	switch (blockID){
 		case 5: //yellow
@@ -54,7 +59,7 @@ void main() {
 		purpleLightData = vec4(lmcoord, 0.0, 1.0);
 		break;
 		default:
-		lightmapData = vec4(newLm, 0.0, 1.0);
+		lightmapData = vec4(lmcoord, 0.0, 1.0);
 		break;
 	}
 	//color.rgb = normal; //write normals to color
