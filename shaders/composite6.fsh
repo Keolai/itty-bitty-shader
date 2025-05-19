@@ -8,12 +8,13 @@ in vec2 texcoord;
 out vec4 color;
 
 uniform int viewWidth;
+uniform int viewHeight;
 
 const float Pi = 6.28318530718; // Pi*2
     
     // GAUSSIAN BLUR SETTINGS {{{
 const float Directions = 10.0; // BLUR DIRECTIONS (Default 16.0 - More is better but slower)
-const float Quality = 4.0; // BLUR QUALITY (Default 4.0 - More is better but slower)
+const float Quality = 3.0; // BLUR QUALITY (Default 4.0 - More is better but slower)
 
 //https://www.shadertoy.com/view/Xltfzj
 void main() { //bloom pass
@@ -37,7 +38,7 @@ void main() { //bloom pass
     vec2 uv = texcoord;
     // Pixel colour
     
-    // Blur calculations
+   // Blur calculations
     for( float d=0.0; d<Pi; d+=Pi/Directions)
     {
 		for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality)
@@ -49,13 +50,16 @@ void main() { //bloom pass
 
     
     
-    vec4 exposure = textureLod(colortex0, vec2(0.5),float(viewWidth)); //dynamic bloom
+   // vec4 exposure = textureLod(colortex0, vec2(0.5),float(viewWidth)); //dynamic bloom
     // Output to screen
-    newColor /= Quality * Directions - 15.0;
-    float brightness = (exposure.x + exposure.y + exposure.z)/3;
-    //color.rgb += newColor.rgb * ((1 - brightness)/20 + 0.01);
-    color.rgb += newColor.rgb * 0.01;
-    color.rgb += newLight.rgb * 0.01;
+    //newColor /= Quality * Directions - 15.0;
+   // vec2 resolution = vec2(float(viewWidth),float(viewHeight));
+    //vec2 uv = texcoord/resolution;
+    //color.rgb = blur13(colortex0,uv,resolution, vec2()).rgb;
+    //float brightness = (exposure.x + exposure.y + exposure.z)/3;
+   // color.rgb += newColor.rgb * ((1 - brightness)/20 + 0.01);
+    color.rgb += newColor.rgb * 0.005;
+    color.rgb += newLight.rgb * 0.005;
     //color.rgb = lighting.rgb;
    // color.rgb = vec3(exposure.r);
     #endif

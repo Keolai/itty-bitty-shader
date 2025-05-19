@@ -11,7 +11,11 @@ const vec3 sunsetColor = vec3(0.922, 0.42, 0);
 const vec3 shadowColorBl = vec3(0.043, 0.18, 0.302);
 const vec3 coldBiomeSun = vec3(0.918, 0.988, 0.98);
 
-const vec3 warmColor = vec3(0.949, 0.569, 0);
+const vec3 warmColor = vec3(0.949, 0.384, 0);
 const vec3 blueColor = vec3(0.314, 0.824, 1);
+const vec3 redColor = vec3(0.9,0,0);
+const vec3 purpleColor = vec3(0.773, 0, 0.949);
+const vec3 greenColor = vec3(0.459, 0.949, 0);
+
 
 const vec3 eyeWaterColors[4] = vec3[4](vec3(1.), vec3(0.4, 0.675, 0.941), vec3(0.929, 0.439, 0),vec3(0.941, 0.655, 0.4));
