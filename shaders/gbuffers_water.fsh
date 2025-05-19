@@ -1,8 +1,10 @@
 #version 430 compatibility
+#include /colors/lightingColors.glsl
 
 uniform sampler2D lightmap;
 uniform sampler2D gtexture;
 uniform sampler2D depthtex0;
+uniform sampler2D colortex4;
 
 uniform float alphaTestRef = 0.1;
 uniform vec3 shadowLightPosition;
@@ -17,12 +19,13 @@ in vec3 noise;
 in vec3 entity;
 
 
-/* RENDERTARGETS: 0,1,2,6,7 */
+/* RENDERTARGETS: 0,1,2,6,7,4 */
 layout(location = 0) out vec4 color;
 layout(location = 1) out vec4 lightmapData; //yellow light sources 
 layout(location = 2) out vec4 encodedNormal;
 layout(location = 3) out vec4 specularity;
 layout(location = 4) out vec4 waterMask;
+layout(location = 5) out vec4 colorLight;
 
 void main() {
 	color = texture(gtexture, texcoord) * glcolor;
@@ -36,6 +39,10 @@ void main() {
 		specularity = vec4(clamp(offset - 0.4,0.0,1.0) * 6,1,0,1) ;//issue for ice
 	} else {
 		specularity = vec4(0,1,0,1);
+	}
+
+	if (entity.x == 3){
+		colorLight = vec4(purpleColor.rgb,1.); //big ISSUE
 	}
 	waterMask = vec4(1.0,0.0,0.0,0.0);
 		color.a *= 0.4;

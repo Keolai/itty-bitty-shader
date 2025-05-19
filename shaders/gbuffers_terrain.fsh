@@ -68,6 +68,8 @@ void main() {
 		case 6:
 		colorLightData = vec4(blueColor,1.);
 		break;
+		case 20:
+		colorLightData = vec4(lavaColor,1.);
 		default:
 		colorLightData = vec4(0,0,0,1);
 		break;

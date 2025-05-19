@@ -3,18 +3,26 @@
 
 uniform sampler2D colortex0;
 uniform sampler2D colortex4;
+uniform sampler2D depthtex0;
 
 in vec2 texcoord;
 out vec4 color;
 
 uniform int viewWidth;
 uniform int viewHeight;
+uniform float far; 
+uniform mat4 gbufferProjectionInverse;
 
 const float Pi = 6.28318530718; // Pi*2
     
     // GAUSSIAN BLUR SETTINGS {{{
 const float Directions = 10.0; // BLUR DIRECTIONS (Default 16.0 - More is better but slower)
 const float Quality = 3.0; // BLUR QUALITY (Default 4.0 - More is better but slower)
+
+vec3 projectAndDivide(mat4 projectionMatrix, vec3 position){
+  vec4 homPos = projectionMatrix * vec4(position, 1.0);
+  return homPos.xyz / homPos.w;
+}
 
 //https://www.shadertoy.com/view/Xltfzj
 void main() { //bloom pass
@@ -23,12 +31,15 @@ void main() { //bloom pass
     vec4 lighting = texture(colortex4,texcoord);
     vec4 newColor = color;
     vec4 newLight = lighting;
-    // float waterMask = texture(colortex6, texcoord).g;
-    // vec3 encodedNormal = texture(colortex2, texcoord).rgb;
-	// vec3 normal = normalize((encodedNormal - 0.5) * 2.0); // we normalize to make sure it is of unit length
-    // float depth = texture(depthtex0, texcoord).r;
-    // vec3 NDCPos = vec3(texcoord.xy, depth) * 2.0 - 1.0;
-	// vec3 viewPos = projectAndDivide(gbufferProjectionInverse, NDCPos);
+
+     float depth = texture(depthtex0, texcoord).r;
+    vec3 NDCPos = vec3(texcoord.xy, depth) * 2.0 - 1.0;
+	vec3 viewPos = projectAndDivide(gbufferProjectionInverse, NDCPos);
+    float dist = length(viewPos) / far;
+
+   // float depth =(texture(depthtex0,texcoord).r);
+
+    
     // GAUSSIAN BLUR SETTINGS }}}
    
     vec2 Radius = vec2(0.01);
@@ -58,9 +69,9 @@ void main() { //bloom pass
     //color.rgb = blur13(colortex0,uv,resolution, vec2()).rgb;
     //float brightness = (exposure.x + exposure.y + exposure.z)/3;
    // color.rgb += newColor.rgb * ((1 - brightness)/20 + 0.01);
-    color.rgb += newColor.rgb * 0.005;
-    color.rgb += newLight.rgb * 0.005;
-    //color.rgb = lighting.rgb;
+    color.rgb += newColor.rgb * 0.002;
+    color.rgb += newLight.rgb * 0.005 * max(pow((1- dist),6),0);
+    //color.rgb = vec3(pow((1- dist),6));
    // color.rgb = vec3(exposure.r);
     #endif
 
