@@ -116,6 +116,7 @@ void main() { //fog
     float topdist = length(topviewPos) / far;
     float fogFactor = exp(-FOG_DENSITY * (1.0 - dist));
     vec3 uCameraView = (gbufferModelViewInverse * vec4(viewPos,1.0)).xyz + cameraPosition;//worldpos
+    float yPos = min(((uCameraView.y + 64)/48),1);
     vec4 noiseFactor = texture(noisetex,uCameraView.xz * vec2(0.01));
     vec3 newFogColor = getFogColor(float(worldTime), biome);
     float fogColorDistance = distance(newFogColor, oldFogColor); //fix
@@ -132,12 +133,13 @@ void main() { //fog
     mixedFog *= eyeWaterColors[isEyeInWater];
     mixedFog = mixedFog * (1 - waterMask) + mix(nightWaterFog,waterFogColor,dayOrNight(float(worldTime))) * waterMask;
     mixedFog = mix(mixedFog,sunOrMoonFog,sunAmount * float(hasSkylight) * min((1.1 - waterMask),1.0)); //turn off for water?
+    mixedFog = mix(mixedFog,depthFogColor,yPos);
     if (isEyeInWater > 1){
       mixedFog = eyeWaterColors[isEyeInWater];
     }
     float extraFog = min((dist * 2),((dist * rainStrength) + (dist * min(isEyeInWater,1.0)) + dist * (1 - dayOrNightVal)/7. + (dist/2 * waterMask)));
     extraFog += (dist * rainStrength);
-    float finalFogFactor = clamp(heightFogFactor * proxDepth + extraFog, 0.0, 1.0);
+    float finalFogFactor = clamp(heightFogFactor * (pow(proxDepth,4)) + extraFog, 0.0, 1.0);
     color.rgb = mix(color.rgb,mixedFog, finalFogFactor);
     color.rgb = mix(color.rgb, skyColor, waterMask * topdist);
 //color.rgb = vec3(heightFogFactor);

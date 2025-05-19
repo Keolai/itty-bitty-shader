@@ -34,12 +34,13 @@ uniform int heldBlockLightValue2;
 const int shadowMapResolution = 2048;
 
 in vec2 texcoord;
+in vec3 mc_Entity;
 
 /* RENDERTARGETS: 0,1,3,4,9 */
 layout(location = 0) out vec4 color;
 layout(location = 1) out vec4 lightmapData;
 layout(location = 2) out vec4 blueLightData; //3
-layout(location = 3) out vec4 purpleLightData; //4
+layout(location = 3) out vec4 colorLightMap;
 layout(location = 4) out vec4 skyMap; //4
 
 
@@ -75,24 +76,9 @@ void main() { //this controls altering light map
 	float lightDistance = length(playerPosLight);
 	float light = max((pow(1- dist,15) * heldLight/18),lightmap.r);
 	lightmap.r = light;
-
-	//lightmap.r = max(min(max(heldBlockLightValue,heldBlockLightValue2),15),lightmap.r); //fixes the yellow bullshit
+	colorLightMap = texture(colortex4,texcoord);
+	//color.rgb = texture(colortex4,texcoord).rgb;
 	
-	// if (heldItemId == 2 || heldItemId2 == 2){ //holding a torch, maybe change from if statement
-	// 	float heldLight = clamp((5./length(feetPlayerPos)) - 0.3,0.0,100.0); //need to fix
-	// 	float totalLight= lightmap.r + heldLight * 32.;
-	// 	//lightmap.r = (max(totalLight,lightmap.r));
-	// 	lightmap.r = (lightDistance * 32) * (33.05 / 32.0) - (1.05 / 32.0) + lightmap.r;
-	// 	//lightmap.g = lightDistance;
-	// }
-	//
-
-	// if (heldItemId == 3 || heldItemId2 == 3){ //holding a torch, maybe change from if statement
-	// 	float heldLight = clamp((5./length(feetPlayerPos)) - 0.3,0.0,32.0);
-	// 	float totalLight= clamp(bluelightmap.r + heldLight * 1.5,0.0,32.0);
-	// 	bluelightmap.r = (max(totalLight,bluelightmap.r));
-	// 	bluelightmap.r = clamp(bluelightmap.r,0.,32.);
-	// }
 
 	lightmapData = vec4(lightmap, 0.0, 1.0);
 	blueLightData = vec4(bluelightmap, 0.0, 1.0);

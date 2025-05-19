@@ -13,4 +13,5 @@ const vec3 warpedForestColor = vec3(0.098, 0.059, 0.149);
 const vec3 crimsonForestColor = vec3(0.549, 0.122, 0.075);
 const vec3 soulSandValleyColor = vec3(0.071, 0.431, 0.522);
 const vec3 basaltDeltaColor = vec3(0.412, 0.263, 0.122);
+const vec3 depthFogColor = vec3(0,0,0);
 const vec3 eyeWaterColors[4] = vec3[4](vec3(1.), vec3(0.4, 0.675, 0.941), vec3(0.941, 0.655, 0.4),vec3(1.));

@@ -104,7 +104,7 @@ vec3 getSoftShadow(vec4 shadowClipPos){
     for (float y = -range; y <= range; y+= increment){
       vec2 offset = vec2(x, y) / shadowMapResolution; // we divide by the resolution so our offset is in terms of pixels
       vec4 offsetShadowClipPos = shadowClipPos + vec4(offset, 0.0, 0.0); // add offset
-      offsetShadowClipPos.z -= 0.001; // apply bias
+      offsetShadowClipPos.z -= 0.002; // apply bias
       offsetShadowClipPos.xyz = distortShadowClipPos(offsetShadowClipPos.xyz); // apply distortion
       vec3 shadowNDCPos = offsetShadowClipPos.xyz / offsetShadowClipPos.w; // convert to NDC space
       vec3 shadowScreenPos = shadowNDCPos * 0.5 + 0.5; // convert to screen space
@@ -150,11 +150,11 @@ void main() {
     vec3 purpLight = purpleMap.r * purpleLightColor;
 	vec4 shadowClipPos = shadowProjection * vec4(shadowViewPos, 1.0);
 	vec3 currentSunlight = getSunlightColor(float(worldTime));
-	vec3 shadow = getSoftShadow(shadowClipPos) * (1 - (dist * 1.5));
+	vec3 shadow = getSoftShadow(shadowClipPos) * (1 - (dist));
   float waterMask = texture(colortex6, texcoord).g;
 	vec3 sunlight = clamp(currentSunlight * dot(normal, worldLightVector) * shadow,vec3(0.0),vec3(1.));
     sunlight += max(getSunset(float(worldTime)) - 0.5,0.) * sunsetColor; //sunset
-    color.rgb += sunlight * clamp((min(pow(texture(colortex6,texcoord).r * 1.2,10),1.0) *(1- (depth)) * 4),0,1) * shadow; //water highlights
+   // color.rgb += sunlight * clamp((min(pow(texture(colortex6,texcoord).r * 1.2,10),1.0) *(1- (depth)) * 4),0,1) * shadow; //water highlights
 	  color.rgb *= blocklight + skylight + ambient + sunlight*float(1.) + blueLight + purpLight;
     color.rgb *= eyeWaterColors[isEyeInWater];
     //color.rgb = texture(colortex3,texcoord).rgb; cloud and bluelight

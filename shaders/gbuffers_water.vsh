@@ -60,7 +60,7 @@ void main() {
 		iter += 1.15;
 	}	
 
-	position.y += sumOfValues/20 - 0.5;
+	position.y += sumOfValues/50 - 0.2;
 	// normal.x += normalSum.x/2;
 	// normal.z += normalSum.y/2;
 	offset = sumOfValues/10;
